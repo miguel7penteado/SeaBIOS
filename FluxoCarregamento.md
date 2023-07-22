@@ -81,19 +81,32 @@ e não pode chamar as várias chamadas **malloc\_X()**.
 Consulte [Modelo de memória](https://seabios.org/Memory_Model "Modelo de memória") para obter mais informações.
 
 
-Main runtime phase
-------------------
+## A fase de Execução Principal
 
-The main runtime phase occurs after the boot phase starts the operating system. Once in this phase, the SeaBIOS code may be invoked by the operating system using various 16bit and 32bit calls. The goal of this phase is to support these legacy calling interfaces and to provide compatibility with BIOS standards. There are multiple entry points for the BIOS - see the entry\_XXX() assembler functions in romlayout.S.
+A fase de **execução principal** ocorre depois que a fase de inicialização inicia o sistema operacional. Uma vez nesta fase, o código SeaBIOS pode ser invocado pelo sistema operacional usando várias chamadas de **16 bits** e **32 bits**. O objetivo desta fase é oferecer suporte a essas interfaces de chamada herdadas e **fornecer compatibilidade** com os padrões do BIOS. 
+Existem vários pontos de entrada para o BIOS - consulte as funções assembler 
+* **entry\_XXX()**
+em **romlayout.S.**
 
-Callers use most of these legacy entry points by setting up a particular CPU register state, invoking the BIOS, and then inspecting the returned CPU register state. To handle this, SeaBIOS will backup the current register state into a "struct bregs" (see romlayout.S, entryfuncs.S, and bregs.h) on call entry and then pass this struct to the C code. The C code can then inspect the register state and modify it. The assembler entry functions will then restore the (possibly modified) register state from the "struct bregs" on return to the caller.
+Os chamadores usam a maioria desses pontos de entrada herdados configurando um determinado estado de registro da CPU, invocando o BIOS e, em seguida, inspecionando o estado de registro da CPU retornado. Para lidar com isso, o SeaBIOS fará backup do estado atual do registro em um "struct bregs" (consulte **romlayout.S**, **entryfuncs.S** e **bregs.h**) na entrada da chamada e, em seguida, passará essa estrutura para o código C. O código C pode então inspecionar o estado do registrador e modificá-lo. As funções de entrada de assembler restaurarão o estado de registro (possivelmente modificado) de "struct bregs" ao retornar a função.
 
-Resume and reboot
------------------
+## Continuar e Reiniciar
 
-As noted above, on emulators SeaBIOS handles the 0xFFFF0000:FFF0 machine startup execution vector. This vector is also called on machine faults and on some machine "resume" events. It can also be called (as 0xF0000:FFF0) by software as a request to reboot the machine (on emulators, coreboot, and CSM).
+Conforme observado acima, em emuladores SeaBIOS lida com o vetor de execução de inicialização da máquina **0xFFFF0000:FFF0**. Este vetor também é chamado em falhas de máquina e em alguns eventos de "retorno" de máquina. Ele também pode ser chamado (como **0xF0000:FFF0**) pelo software como uma solicitação para reinicializar a máquina (em emuladores, coreboot e CSM).
 
-The SeaBIOS "resume and reboot" code handles these calls and attempts to determine the desired action of the caller. Code flow starts in 16bit mode in romlayout.S:reset\_vector() which calls romlayout.S:entry\_post() which calls romlayout.S:entry\_resume() which calls resume.c:handle\_resume(). Depending on the request the handle\_resume() code may transition to 32bit mode.
+O código SeaBIOS "resume and reboot" lida com essas chamadas e tenta determinar a ação desejada do chamador. O fluxo de código começa no modo de 16 bits em
+
+```asm
+# arquivo romlayout.S
+reset\_vector()
+```
+que chama 
+```asm
+# arquivo romlayout.S
+entry\_post() 
+```
+
+que chama romlayout.S:entry\_resume() que chama resume.c:handle\_resume(). Dependendo da solicitação, o código handle\_resume() pode fazer a transição para o modo de 32 bits.
 
 Technically this code is part of the "runtime" phase, so even though parts of it run in 32bit mode it still has the same limitations of the runtime phase.
 
