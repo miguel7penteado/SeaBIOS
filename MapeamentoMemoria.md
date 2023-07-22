@@ -9,7 +9,7 @@ Durante a evolução das CPUs x86 do 8086 para o 80386, o **BIOS foi estendido**
 
 Esta seção descreve os cinco diferentes modelos de execução de CPU x86 e acesso à memória suportados pelo SeaBIOS.
 
-## Modo Real (16 bits)
+## Modo Real em 16 bits
 
 Este modo é um modo de memória [**segmentada**](http://en.wikipedia.org/wiki/Memory_segmentation) invocado pelas funções. O padrão da CPU é executar **instruções de 16 bits**. As funções normalmente invocam a BIOS emitindo uma instrução 
 ```asm
@@ -17,7 +17,7 @@ int "número"
 ```
 que causa uma [**interrupção**](http://en.wikipedia.org/wiki/Interrupt) **de software** que é **manipulada pela BIOS**. O código SeaBIOS também lida com **interrupções de hardware** neste modo. O SeaBIOS **só pode acessar o primeiro 1 Megabyte de memória** neste modo, mas pode acessar **qualquer parte** desse primeiro megabyte.
 
-# O "Grande" Modo Real (16 bits)
+# O "Grande" Modo Real em 16 bits
 
 Este modo é um modo de memória segmentada usado para [option roms](http://en.wikipedia.org/wiki/Option_ROM). O padrão da CPU é **executar instruções de 16 bits** e os **acessos segmentados à memória** ainda são usados. No entanto, os limites do segmento são aumentados para que todos os **primeiros 4 gigabytes de memória** sejam totalmente acessíveis. Os chamadores podem invocar todas as funções do [Modo Real (16 bits)](#Modo_Real_(16_bits)) enquanto estiverem neste modo e também podem invocar as funções **Post Memory Manager (PMM)** que estão disponíveis durante a execução da opção rom.
 
@@ -46,7 +46,7 @@ O SeaBIOS usa o mesmo código para todos os modos de 16 bits ([Modo Real em 16 b
 
 Dois sinalizadores de tempo de compilação estão disponíveis para determinar o modelo de memória para o qual o código se destina: MODE16 e MODESEGMENT. Ao compilar para os modos de 16 bits, MODE16 é verdadeiro e MODESEGMENT é verdadeiro. No modo segmentado de 32 bits, MODE16 é falso e MODESEGMENT é verdadeiro. No modo plano de 32 bits, MODE16 e MODESEGMENT são falsos.
 
-## Memória comum usada em tempo de execução
+## Memória comum usada em Tempo de Execução
 
 Existem várias áreas de memória que o SeaBIOS "runtime" [fase](https://seabios.org/Execution_and_code_flow "Execução e fluxo de código") utiliza:
 ### Tabela do descritor de interrupção (IDT)
@@ -96,7 +96,7 @@ Durante a [fase] do POST (https://seabios.org/Execution_and_code_flow "Execuçã
 ### Zona temporária de alta memória
 * **malloc_tmphigh** : Zona temporária de alta memória. Esta área é usada para armazenamento personalizado de leitura/gravação durante a fase de inicialização do SeaBIOS. A área geralmente começa após o primeiro 1 megabyte de RAM (0x100000) e termina antes da zona permanente de alta memória. Ao rodar em um emulador que tenha apenas 1 megabyte de ram esta zona estará vazia. A área não é reservada do sistema operacional, portanto não deve ser acessada após a fase de inicialização do SeaBIOS.
 
-### Zona temporária de pouca memória
+### Zona temporária de baixa memória
 * **malloc_tmplow** : Zona temporária de pouca memória. Esta área é usada para armazenamento personalizado de leitura/gravação durante a fase de inicialização do SeaBIOS. A área reside entre 0x07000-0x90000. A área não é reservada do sistema operacional e por especificação é necessário zerá-la ao final da fase de inicialização.
 
 >> As regiões "tmplow" e "tmphigh" só estão disponíveis durante a fase de inicialização. Qualquer acesso (leitura ou gravação) após a conclusão da fase de inicialização pode resultar em erros difíceis de encontrar.
