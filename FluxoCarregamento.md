@@ -34,7 +34,7 @@ No **coreboot**, a compilação faz com que
 
 * **romlayout.S:entry\_elf()**
   
-seja chamado no modo de 32 bits. Isso chama 
+seja chamado no **modo de 32 bits**. Isso chama 
 
 * **post.c:handle\_post().**
 
