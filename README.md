@@ -23,6 +23,9 @@ A `SeaBIOS` pode ser configurado com `kconfig` (Sistema de Construção do Kerne
 Para alterar o padrão configuração pode-se executar `make menuconfig` antes de executar `make`.
 Para outros tipos de compilações e para desenvolvedores mais detalhados documentação, consulte a documentação on-line listada acima.
 
+## Como funciona a memória nos PCs x86 desde a época do DOS ?
+Para sabero como a SeaBIOS faz a compatibilidade do PC coms as várias evoluções do modo de funcionamento do processador consulte o [Mapeamento da Memória](MapeamentoMemoria.md)
+
 ## Como funciona ?
 Para saber como a bios configura o hardware e deixa tudo pronto para o Sistema Operacional de uma olhada em [Fluxo de Carregamento](FluxoCarregamento.md).
 
