@@ -18,21 +18,24 @@ Em emuladores, esta fase começa quando a CPU inicia a execução no **modo 16 b
 
 Os emuladores mapeiam o binário SeaBIOS para este endereço e o SeaBIOS organiza para que 
 
-* **romlayout.S:reset\_vector() **
+* **romlayout.S:reset\_vector()**
 * 
 esteja presente lá. Este código chama
 
-* **romlayout.S:entry\_post() **
+* **romlayout.S:entry\_post()**
 
 que então chama 
 
-* **post.c:handle\_post() **
+* **post.c:handle\_post()**
 
 no **modo de 32 bits**.
 
 No **coreboot**, a compilação faz com que 
+
 * **romlayout.S:entry\_elf()**
+  
 seja chamado no modo de 32 bits. Isso chama 
+
 * **post.c:handle\_post().**
 
 On CSM, the build arranges for romlayout.S:entry\_csm() to be called (in 16bit mode). This then calls csm.c:handle\_csm() in 32bit mode. Unlike on the emulators and coreboot, the SeaBIOS CSM POST phase is orchestrated with UEFI and there are several calls back and forth between SeaBIOS and UEFI via handle\_csm() throughout the POST process.
