@@ -1,21 +1,23 @@
-# Memory Model - SeaBIOS
-The SeaBIOS code is required to support multiple x86 CPU memory models. This requirement impacts the code layout and internal storage of SeaBIOS.
+# Modelos de Memória - SeaBIOS
+O código SeaBIOS é necessário para suportar vários **modelos de memória de CPU x86**. Este requisito afeta o **layout do código** e o **armazenamento interno** do SeaBIOS.
 
-The x86 line of CPUs has evolved over many years. The original 8086 chip used 16bit pointers and could only address 1 megabyte of memory. The 80286 CPU still used 16bit pointers, but could address up to 16 megabytes of memory. The 80386 chips could process 32bit instructions and could access up to 4 gigabyte of memory. The most recent x86 chips can process 64bit instructions and access 16 exabytes of ram.
+A **linha de CPUs x86** evoluiu ao longo de muitos anos. O processador **8086 original** usava **ponteiros de 16 bits** e só podia **endereçar 1 Megabyte de memória**. O processador **80286** ainda usava **ponteiros de 16 bits**, mas podia **endereçar até 16 Megabytes de memória**. Os processadores **80386** já podiam processar **instruções de 32 bits** e **acessar até 4 Gigabytes de memória**. Os processadores x86 mais recentes podem processar **instruções de 64 bits** e acessar **16 Hexabytes de memória** RAM.
 
-During the evolution of the x86 CPUs from the 8086 to the 80386 the BIOS was extended to handle calls in the various modes that the CPU implemented.
+Durante a evolução das CPUs x86 do 8086 para o 80386, o **BIOS foi estendido** para lidar com chamadas nos vários modos implementados pela CPU.
 
-This section outlines the five different x86 CPU execution and memory access models that SeaBIOS supports.
+Esta seção descreve os cinco diferentes modelos de execução de CPU x86 e acesso à memória suportados pelo SeaBIOS.
 
-16bit real mode
----------------
+## Modo Real (16 bits)
 
-This mode is a [segmented](http://en.wikipedia.org/wiki/Memory_segmentation) memory mode invoked by callers. The CPU defaults to executing 16bit instructions. Callers typically invoke the BIOS by issuing an "int x" instruction which causes a software [interrupt](http://en.wikipedia.org/wiki/Interrupt) that is handled by the BIOS. The SeaBIOS code also handles hardware interrupts in this mode. SeaBIOS can only access the first 1 megabyte of memory in this mode, but it can access any part of that first megabyte.
+Este modo é um modo de memória [**segmentada**](http://en.wikipedia.org/wiki/Memory_segmentation) invocado pelas funções. O padrão da CPU é executar **instruções de 16 bits**. As funções normalmente invocam a BIOS emitindo uma instrução 
+```asm
+int "número"
+```
+que causa uma [**interrupção**](http://en.wikipedia.org/wiki/Interrupt) **de software** que é **manipulada pela BIOS**. O código SeaBIOS também lida com **interrupções de hardware** neste modo. O SeaBIOS **só pode acessar o primeiro 1 Megabyte de memória** neste modo, mas pode acessar **qualquer parte** desse primeiro megabyte.
 
-16bit bigreal mode
-------------------
+# O "Grande" Modo Real (16 bits)
 
-This mode is a segmented memory mode that is used for [option roms](http://en.wikipedia.org/wiki/Option_ROM). The CPU defaults to executing 16bit instructions and segmented memory accesses are still used. However, the segment limits are increased so that the entire first 4 gigabytes of memory is fully accessible. Callers can invoke all the [16bit real mode](#16bit_real_mode) functions while in this mode and can also invoke the Post Memory Manager (PMM) functions that are available during option rom execution.
+Este modo é um modo de memória segmentada usado para [option roms](http://en.wikipedia.org/wiki/Option_ROM). O padrão da CPU é **executar instruções de 16 bits** e os **acessos segmentados à memória** ainda são usados. No entanto, os limites do segmento são aumentados para que todos os **primeiros 4 gigabytes de memória** sejam totalmente acessíveis. Os chamadores podem invocar todas as funções do [Modo Real (16 bits)](#Modo_Real_(16_bits)) enquanto estiverem neste modo e também podem invocar as funções **Post Memory Manager (PMM)** que estão disponíveis durante a execução da opção rom.
 
 16bit protected mode
 --------------------
