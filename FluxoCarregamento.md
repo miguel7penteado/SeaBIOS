@@ -74,7 +74,12 @@ que então faz a transição para o **modo de 32 bits** e chama
 ou
 * **boot.c:handle\_18()**.
 
-The boot phase is technically also part of the "runtime" phase of SeaBIOS. It is typically invoked immediately after the POST phase, but it can also be invoked by an operating system or be invoked multiple times in an attempt to find a valid boot media. Although the boot phase C code runs in 32bit mode it does not have write access to the 0x0f0000-0x100000 memory region and can not call the various malloc\_X() calls. See [Memory Model](https://seabios.org/Memory_Model "Memory Model") for more information.
+A fase de inicialização também faz parte tecnicamente da fase de **execuçã principal** do SeaBIOS. Normalmente, ele é chamado imediatamente após a fase POST, mas também pode ser chamado por um sistema operacional ou várias vezes na tentativa de encontrar uma mídia de inicialização válida. Embora o código C da fase de inicialização seja executado no **modo de 32 bits**, ele não tem acesso de gravação à região de memória 
+* **0x0f0000-0x100000**
+e não pode chamar as várias chamadas **malloc\_X()**.
+
+Consulte [Modelo de memória](https://seabios.org/Memory_Model "Modelo de memória") para obter mais informações.
+
 
 Main runtime phase
 ------------------
