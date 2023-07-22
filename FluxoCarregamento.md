@@ -1,12 +1,15 @@
-# Execution and code flow - SeaBIOS
-This page provides a high-level description of some of the major code phases that SeaBIOS transitions through and general information on overall code flow.
+# Execução e fluxo de código - SeaBIOS
+Esta página fornece uma descrição de alto nível de algumas das principais fases do código pelas quais o SeaBIOS transita e informações gerais sobre o fluxo geral do código.
 
-The SeaBIOS code goes through a few distinct code phases during its execution lifecycle. Understanding these code phases can help when reading and enhancing the code.
+O código `SeaBIOS` passa por algumas fases de código distintas durante seu ciclo de vida de execução. Entender essas fases do código pode ajudar na leitura e aprimoramento do código.
 
-POST phase
-----------
+## A fase de POST
 
-The Power On Self Test (POST) phase is the initialization phase of the BIOS. This phase is entered when SeaBIOS first starts execution. The goal of the phase is to initialize internal state, initialize external interfaces, detect and setup hardware, and to then start the boot phase.
+A fase _Power On Self Test_ (POST) é a fase de inicialização da BIOS. Esta fase é percorrida quando o SeaBIOS inicia a execução pela primeira vez. O objetivo da fase é:
+-*inicializar o estado interno*;
+-*inicializar as interfaces externas*;
+-*detectar e configurar o hardware*; e, 
+-*iniciar a fase de inicialização*.
 
 On emulators, this phase starts when the CPU starts execution in 16bit mode at 0xFFFF0000:FFF0. The emulators map the SeaBIOS binary to this address, and SeaBIOS arranges for romlayout.S:reset\_vector() to be present there. This code calls romlayout.S:entry\_post() which then calls post.c:handle\_post() in 32bit mode.
 
