@@ -44,7 +44,17 @@ O SeaBIOS usa o mesmo código para todos os modos de 16 bits ([Modo Real em 16 b
 
 ## FLAGS de modo de código C
 
-Dois sinalizadores de tempo de compilação estão disponíveis para determinar o modelo de memória para o qual o código se destina: MODE16 e MODESEGMENT. Ao compilar para os modos de 16 bits, MODE16 é verdadeiro e MODESEGMENT é verdadeiro. No modo segmentado de 32 bits, MODE16 é falso e MODESEGMENT é verdadeiro. No modo plano de 32 bits, MODE16 e MODESEGMENT são falsos.
+Dois sinalizadores de tempo de compilação estão disponíveis para determinar o modelo de memória para o qual o código se destina: 
+* MODE16;
+* MODESEGMENT;
+Ao compilar para os modos de 16 bits, MODE16 é verdadeiro e MODESEGMENT é verdadeiro. No modo segmentado de 32 bits, MODE16 é falso e MODESEGMENT é verdadeiro. No modo plano de 32 bits, MODE16 e MODESEGMENT são falsos.
+
+| FLAG | MODE16 | MODESEGMENT | Modo de Memória         |
+|------|--------|-------------|-------------------------|
+| Bool | False  | False       | 32 Bits Modo Protegido  |
+| Bool | False  | True        | 32 Bits Modo Segmentado |
+| Bool | True   | False       | ???                     |
+| Bool | True   | True        | Modos de 16 bits        |
 
 ## Memória comum usada em Tempo de Execução
 
