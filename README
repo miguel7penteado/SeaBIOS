@@ -1,4 +1,5 @@
-Bem-vindo ao projeto SeaBIOS! 
+
+## Bem-vindo ao projeto SeaBIOS! 
 Este projeto implementa uma bios no formato histórica X86 que é construída usando-se com ferramentas padrão GNU.
 
 Consulte as informações de compilação e desenvolvedor em:
@@ -8,7 +9,11 @@ Consulte as informações de compilação e desenvolvedor em:
 Para os impacientes, o SeaBIOS foi desenvolvido para QEMU e testado no QEMU com:
 
 ```bash
+# baixe o projeto 
+# crie uma pasta local_do_projeto e salve e descompacte o fonte do seabios la dentro
+cd local_do_projeto
 make
+# considerando que você tenha o qemu instalado
 qemu -bios out/bios.bin
 ```
 
