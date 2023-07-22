@@ -97,12 +97,12 @@ Conforme observado acima, em emuladores SeaBIOS lida com o vetor de execução d
 O código SeaBIOS "resume and reboot" lida com essas chamadas e tenta determinar a ação desejada do chamador. O fluxo de código começa no modo de 16 bits em
 
 ```asm
-# arquivo romlayout.S
+;; arquivo romlayout.S
 reset\_vector()
 ```
 que chama 
 ```asm
-# arquivo romlayout.S
+;; arquivo romlayout.S
 entry\_post() 
 ```
 
