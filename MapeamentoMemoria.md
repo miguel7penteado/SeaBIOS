@@ -140,6 +140,15 @@ OBS Registradores Gerais Processador Intel 386 adiante:
 | 20 | VIP | Sinalizador de Interrupção Virtual Pendente |
 | 21 | ID | Sinalizador de ID |
 
+#### Os registradores de modo protegido do processador:
+
+| Registrador Modo Protegido | Descrição |
+|---|---|
+| GDTR | Global Descriptor Table Register |
+| IDTR | Interrupt Descriptor Table Register |
+| LDTR | Local DTR |
+| TR |  |
+
 As funções de entrada ASSEMBLER para chamadas de modo segmentado (todos os modos, exceto [32bit flat mode](#32bit_flat_mode)) irão configurar o **segmento de dados %ds** para ser o mesmo que o **segmento de pilha %ss** antes de chamar qualquer **código C**. Isso permite que todas as **variáveis C localizadas na pilha** e os **ponteiros C para os dados localizados na pilha** funcionem normalmente.
 
 No entanto, todo código em execução no modo segmentado deve agrupar os acessos à memória não empilhada em **macros especiais**. Essas macros garantem que o registro de segmento correto seja usado. A falha em usar a macro correta resultará em um acesso incorreto à memória que provavelmente causará erros difíceis de encontrar.
