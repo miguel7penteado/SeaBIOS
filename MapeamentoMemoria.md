@@ -98,6 +98,13 @@ OBS Registradores Gerais Processador Intel 386 adiante:
 
 As funções de entrada ASSEMBLER para chamadas de modo segmentado (todos os modos, exceto [32bit flat mode](#32bit_flat_mode)) irão configurar o segmento de dados (%ds) para ser o mesmo que o segmento de pilha (%ss) antes de chamar qualquer código C. Isso permite que todas as variáveis C localizadas na pilha e os ponteiros C para os dados localizados na pilha funcionem normalmente.
 
+| Registrador de Segmento | Finalidade |
+|---|---|
+| CS | Contém o segmento de código no qual seu programa é executado. Alterar seu valor pode travar o computador. |
+| DS | Contém o segmento de Dados que seu programa acessa. Alterar seu valor pode fornecer dados incorretos. |
+| ES,FS,GS | Estes são registradores de segmento extras disponíveis para endereçamento de ponteiro distante, como memória de vídeo e outros. |
+| SS | Mantém o segmento de Pilha que seu programa usa. Às vezes tem o mesmo valor que DS. Alterar seu valor pode gerar resultados imprevisíveis, principalmente relacionados a dados. |
+
 No entanto, todo código em execução no modo segmentado deve agrupar os acessos à memória não empilhada em macros especiais. Essas macros garantem que o registro de segmento correto seja usado. A falha em usar a macro correta resultará em um acesso incorreto à memória que provavelmente causará erros difíceis de encontrar.
 
 Existem três macros de acesso à memória de baixo nível:
