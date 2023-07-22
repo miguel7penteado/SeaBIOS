@@ -22,21 +22,21 @@ Os emuladores mapeiam o binário SeaBIOS para este endereço e o SeaBIOS organiz
 
 ```asm
 ;;romlayout.S
-reset\_vector()
+reset_vector()
 ```
 
 esteja presente lá. Este código chama
 
 ```asm
 ;;romlayout.S
-entry\_post()
+entry_post()
 ```
 
 que então chama 
 
 ```cpp
 // post.c
-handle\_post()
+handle_post()
 ```
 
 no **modo de 32 bits**.
@@ -44,34 +44,34 @@ No **coreboot**, a compilação faz com que
 
 ```asm
 ;;romlayout.S
-entry\_elf()
+entry_elf()
 ```
   
 seja chamado no **modo de 32 bits**. Isso chama 
 
 ```cpp
 // post.c
-handle\_post()
+handle_post()
 ```
 
 No CSM, a construção organiza para que 
 
 ```asm
 ;;romlayout.S
-entry\_csm()
+entry_csm()
 ```
 
 seja chamado (no **modo de 16 bits** ). Isso então chama
 
 ```cpp
 // csm.c
-handle\_csm()
+handle_csm()
 ```
 no **modo de 32 bits**. Ao contrário dos emuladores e do coreboot, a fase SeaBIOS CSM POST é orquestrada com UEFI e há várias chamadas entre SeaBIOS e UEFI via 
 
 ```cpp
 // csm.c
-handle\_csm()
+handle_csm()
 ```
 durante todo o processo POST.
 
@@ -91,27 +91,27 @@ O objetivo da **fase de inicialização** (**Fase BOOT**)  é carregar a primeir
 O fluxo de código **começa no modo de 16 bits** em 
 ```asm
 ;;romlayout.S
-entry\_19()
+entry_19()
 ```
  ou
  ```asm
 ;;romlayout.S
-entry\_18()
+entry_18()
 ```
 que então faz a transição para o **modo de 32 bits** e chama
 ```cpp
 // boot.c
-handle\_19()**
+handle_19()**
 ```
 ou
 ```cpp
 // boot.c
-handle\_18()
+handle_18()
 ```
 
 A fase de inicialização também faz parte tecnicamente da fase de **execuçã principal** do SeaBIOS. Normalmente, ele é chamado imediatamente após a fase POST, mas também pode ser chamado por um sistema operacional ou várias vezes na tentativa de encontrar uma mídia de inicialização válida. Embora o código C da fase de inicialização seja executado no **modo de 32 bits**, ele não tem acesso de gravação à região de memória 
 * **0x0f0000-0x100000**
-e não pode chamar as várias chamadas **malloc\_X()**.
+e não pode chamar as várias chamadas **malloc_X()**.
 
 Consulte [Modelo de memória](https://seabios.org/Memory_Model "Modelo de memória") para obter mais informações.
 
@@ -122,7 +122,7 @@ A fase de **execução principal** ocorre depois que a fase de inicialização i
 Existem vários pontos de entrada para o BIOS - consulte as funções assembler 
 ```asm
 ;; romlayout.S
-entry\_XXX()
+entry_XXX()
 ```
 em **romlayout.S.**
 
@@ -136,25 +136,25 @@ O código SeaBIOS "resume and reboot" lida com essas chamadas e tenta determinar
 
 ```asm
 ;; arquivo romlayout.S
-reset\_vector()
+reset_vector()
 ```
 que chama 
 ```asm
 ;; arquivo romlayout.S
-entry\_post() 
+entry_post() 
 ```
 
 que chama 
 ```asm
 ;;romlayout.S
-entry\_resume()
+entry_resume()
 ```
 que chama 
 ```cpp
 //resume.c
-handle\_resume();
+handle_resume();
 ```
-Dependendo da solicitação, o código **handle\_resume()** pode fazer a transição para o **modo de 32 bits**.
+Dependendo da solicitação, o código **handle_resume()** pode fazer a transição para o **modo de 32 bits**.
 
 Tecnicamente, esse código faz parte da fase de _execução principal_, portanto, embora partes dele sejam executadas no **modo de 32 bits**, ele ainda possui as mesmas limitações da fase de _execução principal_.
 
