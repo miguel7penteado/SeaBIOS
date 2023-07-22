@@ -6,10 +6,11 @@ O código `SeaBIOS` passa por algumas fases de código distintas durante seu cic
 ## A fase de POST
 
 A fase _Power On Self Test_ (POST) é a fase de inicialização da BIOS. Esta fase é percorrida quando o SeaBIOS inicia a execução pela primeira vez. O objetivo da fase é:
--*inicializar o estado interno*;
--*inicializar as interfaces externas*;
--*detectar e configurar o hardware*; e, 
--*iniciar a fase de inicialização*.
+
+*- *inicializar o estado interno*;
+*- *inicializar as interfaces externas*;
+*- *detectar e configurar o hardware*; e, 
+*- *iniciar a fase de inicialização*.
 
 On emulators, this phase starts when the CPU starts execution in 16bit mode at 0xFFFF0000:FFF0. The emulators map the SeaBIOS binary to this address, and SeaBIOS arranges for romlayout.S:reset\_vector() to be present there. This code calls romlayout.S:entry\_post() which then calls post.c:handle\_post() in 32bit mode.
 
