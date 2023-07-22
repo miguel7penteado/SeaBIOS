@@ -38,21 +38,41 @@ seja chamado no **modo de 32 bits**. Isso chama
 
 * **post.c:handle\_post().**
 
-On CSM, the build arranges for romlayout.S:entry\_csm() to be called (in 16bit mode). This then calls csm.c:handle\_csm() in 32bit mode. Unlike on the emulators and coreboot, the SeaBIOS CSM POST phase is orchestrated with UEFI and there are several calls back and forth between SeaBIOS and UEFI via handle\_csm() throughout the POST process.
+No CSM, a construção organiza para que 
 
-The POST phase itself has several sub-phases.
+* **romlayout.S:entry\_csm()**
 
-*   The "preinit" sub-phase: code run prior to [code relocation](https://seabios.org/Linking_overview#Code_relocation "Linking overview").
-*   The "init" sub-phase: code to initialize internal variables and interfaces.
-*   The "setup" sub-phase: code to setup hardware and drivers.
-*   The "prepboot" sub-phase: code to finalize interfaces and prepare for the boot phase.
+seja chamado (no **modo de 16 bits** ). Isso então chama
 
-At completion of the POST phase, SeaBIOS invokes an "int 0x19" software interrupt in 16bit mode which begins the boot phase.
+* **csm.c:handle\_csm()**
 
-Boot phase
-----------
+no **modo de 32 bits**. Ao contrário dos emuladores e do coreboot, a fase SeaBIOS CSM POST é orquestrada com UEFI e há várias chamadas entre SeaBIOS e UEFI via 
 
-The goal of the boot phase is to load the first portion of the operating system's boot loader into memory and start execution of that boot loader. This phase starts when a software interrupt ("int 0x19" or "int 0x18") is invoked. The code flow starts in 16bit mode in romlayout.S:entry\_19() or romlayout.S:entry\_18() which then transition to 32bit mode and call boot.c:handle\_19() or boot.c:handle\_18().
+*  **handle\_csm()**
+
+durante todo o processo POST.
+
+### Sub-Fases da POST
+A própria fase POST possui várias subfases.
+
+*   A subfase **preinit**: código executado antes [code relocation](https://seabios.org/Linking_overview#Code_relocation "Linking overview").
+*   A subfase **init**: código para inicializar variáveis internas e interfaces.
+*   A subfase **configuração**: código para configurar hardware e drivers.
+*   A subfase **prepboot**: código para finalizar as interfaces e preparar para a fase de inicialização.
+
+Na conclusão da fase POST, o SeaBIOS invoca uma interrupção de software **int 0x19** no **modo de 16 bits** que inicia a fase de inicialização.
+
+# A fase BOOT
+
+O objetivo da **fase de inicialização** (**Fase BOOT**)  é carregar a primeira parte do carregador de inicialização do sistema operacional na memória e iniciar a execução desse carregador de inicialização. Esta fase começa quando uma interrupção de software (**int 0x19** ou **int 0x18**) é invocada. 
+O fluxo de código **começa no modo de 16 bits** em 
+* **romlayout.S:entry\_19()**
+ ou
+* **romlayout.S:entry\_18()**
+que então faz a transição para o **modo de 32 bits** e chama
+* **boot.c:handle\_19()**
+ou
+* **boot.c:handle\_18()**.
 
 The boot phase is technically also part of the "runtime" phase of SeaBIOS. It is typically invoked immediately after the POST phase, but it can also be invoked by an operating system or be invoked multiple times in an attempt to find a valid boot media. Although the boot phase C code runs in 32bit mode it does not have write access to the 0x0f0000-0x100000 memory region and can not call the various malloc\_X() calls. See [Memory Model](https://seabios.org/Memory_Model "Memory Model") for more information.
 
