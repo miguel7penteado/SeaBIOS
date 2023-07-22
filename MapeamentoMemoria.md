@@ -86,6 +86,16 @@ Existem várias áreas de memória que o SeaBIOS "runtime" [fase](https://seabio
 
 ## Acesso à memória em modo segmentado
 
+OBS Registradores Gerais Processador Intel 386 adiante:
+
+| Registrador Geral | Uso do tamanho | Finalidade                                                                                                                         |
+|-------------------|----------------|------------------------------------------------------------------------------------------------------------------------------------|
+| Registrador A     | EAX,AX,AH,AL   | Chamado de registrador do Acumulador. É usado para acesso à porta de E/S, aritmética, chamadas de interrupção, etc...              |
+| Registrador B     | EBX,BX,BH,BL   | Chamado de Base cadastral. Ele é usado como um ponteiro base para acesso à memória. Obtém alguns valores de retorno de interrupção |
+| Registrador C     | ECX,CX,CH,CL   | Chamado o contador de registro. É usado como um contador de loop e para turnos. Obtém alguns valores de interrupção                |
+| Registrador E     | EDX,DX,DH,DL   | Chamado o registro de dados. É usado para acesso à porta de E/S, aritmética, algumas chamadas de interrupção.                      |
+
+
 As funções de entrada ASSEMBLER para chamadas de modo segmentado (todos os modos, exceto [32bit flat mode](#32bit_flat_mode)) irão configurar o segmento de dados (%ds) para ser o mesmo que o segmento de pilha (%ss) antes de chamar qualquer código C. Isso permite que todas as variáveis C localizadas na pilha e os ponteiros C para os dados localizados na pilha funcionem normalmente.
 
 No entanto, todo código em execução no modo segmentado deve agrupar os acessos à memória não empilhada em macros especiais. Essas macros garantem que o registro de segmento correto seja usado. A falha em usar a macro correta resultará em um acesso incorreto à memória que provavelmente causará erros difíceis de encontrar.
