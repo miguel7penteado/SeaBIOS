@@ -8,8 +8,8 @@ Consulte as informações de compilação e desenvolvedor em:
 Para os impacientes, o SeaBIOS foi desenvolvido para QEMU e testado no QEMU com:
 
 ```bash
-  make
-  qemu -bios out/bios.bin
+make
+qemu -bios out/bios.bin
 ```
 
 A `SeaBIOS` pode ser configurado com `kconfig` (Sistema de Construção do Kernel do Linux). 
