@@ -7,14 +7,27 @@ O código `SeaBIOS` passa por algumas fases de código distintas durante seu cic
 
 A fase _Power On Self Test_ (POST) é a fase de inicialização da BIOS. Esta fase é percorrida quando o SeaBIOS inicia a execução pela primeira vez. O objetivo da fase é:
 
-* -*inicializar o estado interno*;
-* -*inicializar as interfaces externas*;
-* -*detectar e configurar o hardware*; e, 
-* -*iniciar a fase de inicialização*.
+* -**inicializar o estado interno**;
+* -**inicializar as interfaces externas**;
+* -**detectar e configurar o hardware**; e, 
+* -**iniciar a fase de inicialização**.
 
-On emulators, this phase starts when the CPU starts execution in 16bit mode at 0xFFFF0000:FFF0. The emulators map the SeaBIOS binary to this address, and SeaBIOS arranges for romlayout.S:reset\_vector() to be present there. This code calls romlayout.S:entry\_post() which then calls post.c:handle\_post() in 32bit mode.
+Em emuladores, esta fase começa quando a CPU inicia a execução no **modo 16 bits** em: 
 
-On coreboot, the build arranges for romlayout.S:entry\_elf() to be called in 32bit mode. This then calls post.c:handle\_post().
+* **0xFFFF0000:FFF0.**
+
+Os emuladores mapeiam o binário SeaBIOS para este endereço e o SeaBIOS organiza para que 
+**romlayout.S:reset\_vector() **
+esteja presente lá. Este código chama 
+**romlayout.S:entry\_post() **
+que então chama 
+**post.c:handle\_post() ** 
+no **modo de 32 bits**.
+
+No coreboot, a compilação faz com que 
+**romlayout.S:entry\_elf()**
+seja chamado no modo de 32 bits. Isso chama 
+**post.c:handle\_post().**
 
 On CSM, the build arranges for romlayout.S:entry\_csm() to be called (in 16bit mode). This then calls csm.c:handle\_csm() in 32bit mode. Unlike on the emulators and coreboot, the SeaBIOS CSM POST phase is orchestrated with UEFI and there are several calls back and forth between SeaBIOS and UEFI via handle\_csm() throughout the POST process.
 
