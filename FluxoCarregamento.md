@@ -35,7 +35,7 @@ entry\_post()
 que então chama 
 
 ```cpp
-# post.c
+// post.c
 handle\_post()
 ```
 
@@ -50,7 +50,7 @@ entry\_elf()
 seja chamado no **modo de 32 bits**. Isso chama 
 
 ```cpp
-post.c
+// post.c
 handle\_post()
 ```
 
@@ -64,13 +64,13 @@ entry\_csm()
 seja chamado (no **modo de 16 bits** ). Isso então chama
 
 ```cpp
-#csm.c
+// csm.c
 handle\_csm()
 ```
 no **modo de 32 bits**. Ao contrário dos emuladores e do coreboot, a fase SeaBIOS CSM POST é orquestrada com UEFI e há várias chamadas entre SeaBIOS e UEFI via 
 
 ```cpp
-#csm.c
+// csm.c
 handle\_csm()
 ```
 durante todo o processo POST.
@@ -100,12 +100,12 @@ entry\_18()
 ```
 que então faz a transição para o **modo de 32 bits** e chama
 ```cpp
-# boot.c
+// boot.c
 handle\_19()**
 ```
 ou
 ```cpp
-# boot.c
+// boot.c
 handle\_18()
 ```
 
@@ -120,7 +120,10 @@ Consulte [Modelo de memória](https://seabios.org/Memory_Model "Modelo de memór
 
 A fase de **execução principal** ocorre depois que a fase de inicialização inicia o sistema operacional. Uma vez nesta fase, o código SeaBIOS pode ser invocado pelo sistema operacional usando várias chamadas de **16 bits** e **32 bits**. O objetivo desta fase é oferecer suporte a essas interfaces de chamada herdadas e **fornecer compatibilidade** com os padrões do BIOS. 
 Existem vários pontos de entrada para o BIOS - consulte as funções assembler 
-* **entry\_XXX()**
+```asm
+;; romlayout.S
+entry\_XXX()
+```
 em **romlayout.S.**
 
 Os chamadores usam a maioria desses pontos de entrada herdados configurando um determinado estado de registro da CPU, invocando o BIOS e, em seguida, inspecionando o estado de registro da CPU retornado. Para lidar com isso, o SeaBIOS fará backup do estado atual do registro em um "struct bregs" (consulte **romlayout.S**, **entryfuncs.S** e **bregs.h**) na entrada da chamada e, em seguida, passará essa estrutura para o código C. O código C pode então inspecionar o estado do registrador e modificá-lo. As funções de entrada de assembler restaurarão o estado de registro (possivelmente modificado) de "struct bregs" ao retornar a função.
