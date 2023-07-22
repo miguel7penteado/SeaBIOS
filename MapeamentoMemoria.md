@@ -1,6 +1,8 @@
 # Modelos de Memória - SeaBIOS
 O código SeaBIOS é necessário para suportar vários **modelos de memória de CPU x86**. Este requisito afeta o **layout do código** e o **armazenamento interno** do SeaBIOS.
 
+## Modelos de Memória x86
+
 A **linha de CPUs x86** evoluiu ao longo de muitos anos. O processador **8086 original** usava **ponteiros de 16 bits** e só podia **endereçar 1 Megabyte de memória**. O processador **80286** ainda usava **ponteiros de 16 bits**, mas podia **endereçar até 16 Megabytes de memória**. Os processadores **80386** já podiam processar **instruções de 32 bits** e **acessar até 4 Gigabytes de memória**. Os processadores x86 mais recentes podem processar **instruções de 64 bits** e acessar **16 Hexabytes de memória** RAM.
 
 Durante a evolução das CPUs x86 do 8086 para o 80386, o **BIOS foi estendido** para lidar com chamadas nos vários modos implementados pela CPU.
@@ -33,12 +35,18 @@ In this mode the processor runs in 32bit mode, but the segment registers may hav
 
 Nesse modo, o padrão do processador é executar instruções de 32 bits e todos os registradores de segmento têm um deslocamento de zero e permitem o acesso a todos os primeiros 4 gigabytes de memória. Este é o único modo "sensato" para código de 32 bits - compiladores modernos e sistemas operacionais modernos geralmente suportam apenas este modo (ao executar código de 32 bits). Ironicamente, é o único modo que não é estritamente necessário para o suporte de um BIOS. SeaBIOS usa este modo internamente para suportar [as fases de execução POST e BOOT](https://seabios.org/Execution_and_code_flow "Execution and code flow").
 
+## A FLAG do Assembler `code16gcc`
+
 Para produzir um código que possa ser executado quando o processador estiver no modo de 16 bits, o SeaBIOS usa a FLAG de ASSEMBLER [binutils ".code16gcc" ](http://en.wikipedia.org/wiki/GNU_Binutils) . Isso instrui o Assembler a emitir opcodes de prefixo extras para que o código de 32 bits produzido por [gcc](http://en.wikipedia.org/wiki/GNU_Compiler_Collection) seja executado mesmo quando o processador estiver no **modo de 16 bits**. 
 >> Observe que o gcc sempre produz código de 32 bits - ele não conhece o sinalizador ".code 16 gcc" e não sabe que o código será executado no modo de 16 bits.
 
 O SeaBIOS usa o mesmo código para todos os modos de 16 bits ([Modo Real em 16 bits](#16bit_real_mode), [Grande Modo Real em 16 bits](#16bit_bigreal_mode) e [Modo Protegido em 16 bits](#16bit_protected_mode)) e esse código é montado (Assembler) usando ".code16gcc". O SeaBIOS tem o cuidado de usar **registradores de segmento adequadamente** para que o mesmo código possa ser executado nos diferentes modos de 16 bits que ele precisa suportar.
 
+## FLAGS de modo de código C
+
 Dois sinalizadores de tempo de compilação estão disponíveis para determinar o modelo de memória para o qual o código se destina: MODE16 e MODESEGMENT. Ao compilar para os modos de 16 bits, MODE16 é verdadeiro e MODESEGMENT é verdadeiro. No modo segmentado de 32 bits, MODE16 é falso e MODESEGMENT é verdadeiro. No modo plano de 32 bits, MODE16 e MODESEGMENT são falsos.
+
+## Memória comum usada em tempo de execução
 
 Existem várias áreas de memória que o SeaBIOS "runtime" [fase](https://seabios.org/Execution_and_code_flow "Execução e fluxo de código") utiliza:
 
@@ -54,7 +62,9 @@ Existem várias áreas de memória que o SeaBIOS "runtime" [fase](https://seabio
  
 Todas as áreas acima também são lidas/gravadas durante a fase de inicialização do SeaBIOS e são acessíveis no modo plano de 32 bits.
 
-As funções de entrada do montador para chamadas de modo segmentado (todos os modos, exceto [32bit flat mode](#32bit_flat_mode)) irão configurar o segmento de dados (%ds) para ser o mesmo que o segmento de pilha (%ss) antes de chamar qualquer código C. Isso permite que todas as variáveis C localizadas na pilha e os ponteiros C para os dados localizados na pilha funcionem normalmente.
+## Acesso à memória em modo segmentado
+
+As funções de entrada ASSEMBLER para chamadas de modo segmentado (todos os modos, exceto [32bit flat mode](#32bit_flat_mode)) irão configurar o segmento de dados (%ds) para ser o mesmo que o segmento de pilha (%ss) antes de chamar qualquer código C. Isso permite que todas as variáveis C localizadas na pilha e os ponteiros C para os dados localizados na pilha funcionem normalmente.
 
 No entanto, todo código em execução no modo segmentado deve agrupar os acessos à memória não empilhada em macros especiais. Essas macros garantem que o registro de segmento correto seja usado. A falha em usar a macro correta resultará em um acesso incorreto à memória que provavelmente causará erros difíceis de encontrar.
 
@@ -71,6 +81,8 @@ Como a maioria dos acessos à memória são para [memória comum usada em tempo 
 * GET_EBDA / SET_EBDA : Acesse a área de dados do BIOS estendida (EBDA).
 * GET_LOW / SET_LOW : Acessar variáveis internas marcadas com VARLOW. (Também existem macros relacionadas GET_LOWFLAT / SET_LOWFLAT para acessar o armazenamento alocado com malloc_low.)
 * GET_GLOBAL : Acessar variáveis internas marcadas com os sinalizadores VAR16 ou VARFSEG. (Há também a macro relacionada GET_GLOBALFLAT para acessar o armazenamento alocado com malloc_fseg.)
+
+## Memória disponível durante a inicialização
 
 Durante a [fase] do POST (https://seabios.org/Execution_and_code_flow "Execução e fluxo de código"), o código pode acessar totalmente os primeiros 4 gigabytes de memória. No entanto, os acessos à memória são geralmente limitados à [memória comum usada em tempo de execução](#Common_memory_used_at_run-time) e áreas alocadas em tempo de execução por meio de uma das chamadas malloc:
 
