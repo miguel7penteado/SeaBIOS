@@ -29,7 +29,7 @@ Some old code may attempt to invoke the standard [16bit real mode](#16bit_real_m
 
 ## O Modo Segmentado em 32 bits
 
-In this mode the processor runs in 32bit mode, but the segment registers may have a limit and may have a non-zero offset. In effect, this mode has all of the limitations of [16bit protected mode](#16bit_protected_mode) - the main difference between the modes is that the processor defaults to executing 32bit instructions. In addition to these limitations, callers may also run the SeaBIOS code at varying virtual addresses and so the code must support code relocation. The PCI BIOS specification and APM BIOS specification define 32bit segmented mode interfaces.
+Nesse modo, o processador é executado no modo de 32 bits, mas os registradores de segmento podem ter um limite e podem ter um deslocamento diferente de zero. Na verdade, este modo tem todas as limitações do [modo protegido de 16 bits](#16bit_protected_mode) - a principal diferença entre os modos é que o padrão do processador é executar instruções de 32 bits. Além dessas limitações, os chamadores também podem executar o código SeaBIOS em vários endereços virtuais e, portanto, o código deve suportar a realocação de código. As especificações PCI BIOS e APM BIOS definem interfaces de modo segmentado de 32 bits.
 
 ## O Modo Protegido em 32 bits (modo plano)
 
