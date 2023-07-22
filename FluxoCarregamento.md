@@ -17,11 +17,17 @@ Em emuladores, esta fase começa quando a CPU inicia a execução no **modo 16 b
 * **0xFFFF0000:FFF0.**
 
 Os emuladores mapeiam o binário SeaBIOS para este endereço e o SeaBIOS organiza para que 
+
 * **romlayout.S:reset\_vector() **
-esteja presente lá. Este código chama 
+* 
+esteja presente lá. Este código chama
+
 * **romlayout.S:entry\_post() **
+
 que então chama 
-* **post.c:handle\_post() ** 
+
+* **post.c:handle\_post() **
+
 no **modo de 32 bits**.
 
 No **coreboot**, a compilação faz com que 
