@@ -14,42 +14,65 @@ A fase _Power On Self Test_ (POST) é a fase de inicialização da BIOS. Esta fa
 
 Em emuladores, esta fase começa quando a CPU inicia a execução no **modo 16 bits** em: 
 
-* **0xFFFF0000:FFF0.**
+```asm
+0xFFFF0000:FFF0
+```
 
 Os emuladores mapeiam o binário SeaBIOS para este endereço e o SeaBIOS organiza para que 
 
-* **romlayout.S:reset\_vector()**
+```asm
+;;romlayout.S
+reset\_vector()
+```
 
 esteja presente lá. Este código chama
 
-* **romlayout.S:entry\_post()**
+```asm
+;;romlayout.S
+entry\_post()
+```
 
 que então chama 
 
-* **post.c:handle\_post()**
+```cpp
+# post.c
+handle\_post()
+```
 
 no **modo de 32 bits**.
-
 No **coreboot**, a compilação faz com que 
 
-* **romlayout.S:entry\_elf()**
+```asm
+;;romlayout.S
+entry\_elf()
+```
   
 seja chamado no **modo de 32 bits**. Isso chama 
 
-* **post.c:handle\_post().**
+```cpp
+post.c
+handle\_post()
+```
 
 No CSM, a construção organiza para que 
 
-* **romlayout.S:entry\_csm()**
+```asm
+;;romlayout.S
+entry\_csm()
+```
 
 seja chamado (no **modo de 16 bits** ). Isso então chama
 
-* **csm.c:handle\_csm()**
-
+```cpp
+#csm.c
+handle\_csm()
+```
 no **modo de 32 bits**. Ao contrário dos emuladores e do coreboot, a fase SeaBIOS CSM POST é orquestrada com UEFI e há várias chamadas entre SeaBIOS e UEFI via 
 
-*  **handle\_csm()**
-
+```cpp
+#csm.c
+handle\_csm()
+```
 durante todo o processo POST.
 
 ### Sub-Fases da POST
@@ -66,13 +89,25 @@ Na conclusão da fase POST, o SeaBIOS invoca uma interrupção de software **int
 
 O objetivo da **fase de inicialização** (**Fase BOOT**)  é carregar a primeira parte do carregador de inicialização do sistema operacional na memória e iniciar a execução desse carregador de inicialização. Esta fase começa quando uma interrupção de software (**int 0x19** ou **int 0x18**) é invocada. 
 O fluxo de código **começa no modo de 16 bits** em 
-* **romlayout.S:entry\_19()**
+```asm
+;;romlayout.S
+entry\_19()
+```
  ou
-* **romlayout.S:entry\_18()**
+ ```asm
+;;romlayout.S
+entry\_18()
+```
 que então faz a transição para o **modo de 32 bits** e chama
-* **boot.c:handle\_19()**
+```cpp
+# boot.c
+handle\_19()**
+```
 ou
-* **boot.c:handle\_18()**.
+```cpp
+# boot.c
+handle\_18()
+```
 
 A fase de inicialização também faz parte tecnicamente da fase de **execuçã principal** do SeaBIOS. Normalmente, ele é chamado imediatamente após a fase POST, mas também pode ser chamado por um sistema operacional ou várias vezes na tentativa de encontrar uma mídia de inicialização válida. Embora o código C da fase de inicialização seja executado no **modo de 32 bits**, ele não tem acesso de gravação à região de memória 
 * **0x0f0000-0x100000**
