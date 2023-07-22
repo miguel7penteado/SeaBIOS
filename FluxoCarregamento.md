@@ -144,22 +144,36 @@ que chama
 entry\_post() 
 ```
 
-que chama romlayout.S:entry\_resume() que chama resume.c:handle\_resume(). Dependendo da solicitação, o código handle\_resume() pode fazer a transição para o modo de 32 bits.
+que chama 
+```asm
+;;romlayout.S
+entry\_resume()
+```
+que chama 
+```cpp
+//resume.c
+handle\_resume();
+```
+Dependendo da solicitação, o código **handle\_resume()** pode fazer a transição para o **modo de 32 bits**.
 
-Technically this code is part of the "runtime" phase, so even though parts of it run in 32bit mode it still has the same limitations of the runtime phase.
+Tecnicamente, esse código faz parte da fase de _execução principal_, portanto, embora partes dele sejam executadas no **modo de 32 bits**, ele ainda possui as mesmas limitações da fase de _execução principal_.
 
-Internally SeaBIOS implements a simple cooperative multi-tasking system. The system works by giving each "thread" its own stack, and the system round-robins between these stacks whenever a thread issues a yield() call. This "threading" system may be more appropriately described as [coroutines](http://en.wikipedia.org/wiki/Coroutine). These "threads" do not run on multiple CPUs and are not preempted, so atomic memory accesses and complex locking is not required.
+Internamente, o SeaBIOS implementa um **sistema multitarefa** cooperativo simples. O sistema funciona dando a cada "thread" sua própria **pilha**, e o sistema **alterna** entre essas **pilhas** sempre que um **thread** emite uma chamada 
+```cpp
+yield();
+```
+Este sistema de linhas de controle paralelas **threading** pode ser mais apropriadamente descrito como [**co-rotinas**](http://en.wikipedia.org/wiki/Coroutine). Esses "threads" não são executados em várias CPUs e não são interrompidos, portanto, **acessos atômicos à memória** e **bloqueio complexo** não são necessários.
 
-The goal of these threads is to reduce overall boot time by parallelizing hardware delays. (For example, by allowing the wait for an ATA hard drive to spin-up and respond to commands to occur in parallel with the wait for a PS/2 keyboard to respond to a setup command.) These hardware setup threads are only available during the "setup" sub-phase of the [POST phase](#POST_phase).
+O objetivo desses encadeamentos é reduzir o tempo geral de inicialização paralelizando os atrasos de hardware. (Por exemplo, permitindo que a espera de um disco rígido ATA gire e responda a comandos ocorra em paralelo com a espera de um teclado PS/2 responder a um comando de configuração).
+O código que implementa threads está em **stacks.c**.
 
-The code that implements threads is in stacks.c.
+O código SeaBIOS C sempre é executado com as interrupções de hardware desativadas. Todos os pontos de entrada do código C (consulte romlayout.S) têm o cuidado de desabilitar explicitamente as interrupções de hardware (via "cli"). Como a execução com as interrupções desabilitadas aumenta a latência da interrupção, qualquer código C que possa fazer um loop por um período de tempo significativo (mais de 1 ms) deve chamar yield() periodicamente. A chamada yield() permitirá brevemente a ocorrência de interrupções de hardware, depois desabilitará as interrupções e retomará a execução do código C.
 
-The SeaBIOS C code always runs with hardware interrupts disabled. All of the C code entry points (see romlayout.S) are careful to explicitly disable hardware interrupts (via "cli"). Because running with interrupts disabled increases interrupt latency, any C code that could loop for a significant amount of time (more than about 1 ms) should periodically call yield(). The yield() call will briefly enable hardware interrupts to occur, then disable interrupts, and then resume execution of the C code.
+Existem duas razões principais pelas quais o SeaBIOS sempre executa o código C com as interrupções desativadas. A primeira razão é que o software externo pode substituir os manipuladores SeaBIOS padrão que são chamados em um evento de interrupção de hardware. De fato, é comum que aplicativos baseados em DOS façam isso. Esses manipuladores de interrupção herdados de terceiros podem ter expectativas não documentadas (como localização e tamanho da pilha) e podem tentar chamar de volta os vários serviços de software SeaBIOS. Maior compatibilidade e resultados mais reprodutíveis podem ser alcançados permitindo apenas interrupções de hardware em pontos específicos (via chamadas yield()). A segunda razão é que grande parte do SeaBIOS é executado no modo de 32 bits. Tentar lidar com interrupções no modo de 16 bits e no modo de 32 bits e alternar entre os modos para delegar essas interrupções é uma complexidade desnecessária. Embora desabilitar as interrupções possa aumentar a latência da interrupção, isso afeta apenas os sistemas legados nos quais é improvável que o pequeno aumento na latência da interrupção seja perceptível.
 
-There are two main reasons why SeaBIOS always runs C code with interrupts disabled. The first reason is that external software may override the default SeaBIOS handlers that are called on a hardware interrupt event. Indeed, it is common for DOS based applications to do this. These legacy third party interrupt handlers may have undocumented expectations (such as stack location and stack size) and may attempt to call back into the various SeaBIOS software services. Greater compatibility and more reproducible results can be achieved by only permitting hardware interrupts at specific points (via yield() calls). The second reason is that much of SeaBIOS runs in 32bit mode. Attempting to handle interrupts in both 16bit mode and 32bit mode and switching between modes to delegate those interrupts is an unneeded complexity. Although disabling interrupts can increase interrupt latency, this only impacts legacy systems where the small increase in interrupt latency is unlikely to be noticeable.
+O SeaBIOS implementa manipuladores de modo real de 16 bits para interrupções de hardware e "interrupções" de solicitação de software. Em um BIOS tradicional, essas solicitações usariam o espaço de pilha do chamador. No entanto, a quantidade mínima de espaço que o chamador deve fornecer não foi padronizada e observou-se que programas DOS muito antigos alocam quantidades muito pequenas de espaço de pilha (100 bytes ou menos).
 
-SeaBIOS implements 16bit real mode handlers for both hardware interrupts and software request "interrupts". In a traditional BIOS, these requests would use the caller's stack space. However, the minimum amount of space the caller must provide has not been standardized and very old DOS programs have been observed to allocate very small amounts of stack space (100 bytes or less).
+Por padrão, o SeaBIOS agora muda para sua própria pilha na maioria dos pontos de entrada do modo real de 16 bits. Este espaço de pilha extra é alocado em ["memória baixa"](https://seabios.org/Memory_Model "Memory Model"). Ele garante que o SeaBIOS use uma quantidade mínima de uma pilha de chamadores (normalmente não mais que 16 bytes) para essas chamadas herdadas. (Interfaces de BIOS definidas mais recentemente, como aquelas que suportam chamadas de modo protegido de 16 bits e 32 bits, padronizam um tamanho mínimo de pilha com espaço adequado, e o SeaBIOS geralmente não usará sua pilha extra nesses casos.)
 
-By default, SeaBIOS now switches to its own stack on most 16bit real mode entry points. This extra stack space is allocated in ["low memory"](https://seabios.org/Memory_Model "Memory Model"). It ensures SeaBIOS uses a minimal amount of a callers stack (typically no more than 16 bytes) for these legacy calls. (More recently defined BIOS interfaces such as those that support 16bit protected and 32bit protected mode calls standardize a minimum stack size with adequate space, and SeaBIOS generally will not use its extra stack in these cases.)
+O código para implementar esse "salto" de pilha está em **romlayout.S** e em **stacks.c**.
 
-The code to implement this stack "hopping" is in romlayout.S and in stacks.c.
