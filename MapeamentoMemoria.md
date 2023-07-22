@@ -89,6 +89,7 @@ Existem várias áreas de memória que o SeaBIOS Utiliza na [fase de execução]
 
 ## Acesso à memória em modo segmentado
 
+#### Os **Registradores Gerais** do processador:
 OBS Registradores Gerais Processador Intel 386 adiante:
 
 | Registradores Gerais | Uso do tamanho | Finalidade                                                                                                                         |
@@ -98,8 +99,7 @@ OBS Registradores Gerais Processador Intel 386 adiante:
 | Registrador C     | ECX,CX,CH,CL   | Chamado o contador de registro. É usado como um contador de loop e para turnos. Obtém alguns valores de interrupção                |
 | Registrador E     | EDX,DX,DH,DL   | Chamado o registro de dados. É usado para acesso à porta de E/S, aritmética, algumas chamadas de interrupção.                      |
 
-
-As funções de entrada ASSEMBLER para chamadas de modo segmentado (todos os modos, exceto [32bit flat mode](#32bit_flat_mode)) irão configurar o segmento de dados (%ds) para ser o mesmo que o segmento de pilha (%ss) antes de chamar qualquer código C. Isso permite que todas as variáveis C localizadas na pilha e os ponteiros C para os dados localizados na pilha funcionem normalmente.
+#### Os **Registradores de Segmento** do processador:
 
 | Registradores de Segmento | Finalidade |
 |---|---|
@@ -108,6 +108,8 @@ As funções de entrada ASSEMBLER para chamadas de modo segmentado (todos os mod
 | ES,FS,GS | Estes são registradores de segmento extras disponíveis para endereçamento de ponteiro distante, como memória de vídeo e outros. |
 | SS | Mantém o segmento de Pilha que seu programa usa. Às vezes tem o mesmo valor que DS. Alterar seu valor pode gerar resultados imprevisíveis, principalmente relacionados a dados. |
 
+#### Os **Registradores de Índice** do processador:
+
 | Registradores de Índice | Tamanhos de Uso | Finalidade |
 |---|---|---|
 | DI | ES:EDI EDI DI | Registro de índice de destino. Usado para string, cópia e configuração de matriz de memória e para endereçamento de ponteiro remoto com ES. |
@@ -115,6 +117,8 @@ As funções de entrada ASSEMBLER para chamadas de modo segmentado (todos os mod
 | BP | SS:EBP EBP BP | Registro de ponteiro de base de pilha. Contém o endereço base da pilha. |
 | SP | SS:ESP ESP SP | Registrador de ponteiro de pilha. Contém o endereço superior da pilha. |
 | IP | CS:EIP EIP IP | Ponteiro de Índice. Mantém o deslocamento da próxima instrução. Só pode ser lido. |
+
+#### O registrador de sinalizadores estendidos **EFLAGS** do processador:
 
 | Ordem do bit  | Nome | Finalidade |
 |---|---|---|
@@ -136,7 +140,9 @@ As funções de entrada ASSEMBLER para chamadas de modo segmentado (todos os mod
 | 20 | VIP | Sinalizador de Interrupção Virtual Pendente |
 | 21 | ID | Sinalizador de ID |
 
-No entanto, todo código em execução no modo segmentado deve agrupar os acessos à memória não empilhada em macros especiais. Essas macros garantem que o registro de segmento correto seja usado. A falha em usar a macro correta resultará em um acesso incorreto à memória que provavelmente causará erros difíceis de encontrar.
+As funções de entrada ASSEMBLER para chamadas de modo segmentado (todos os modos, exceto [32bit flat mode](#32bit_flat_mode)) irão configurar o **segmento de dados %ds** para ser o mesmo que o **segmento de pilha %ss** antes de chamar qualquer **código C**. Isso permite que todas as **variáveis C localizadas na pilha** e os **ponteiros C para os dados localizados na pilha** funcionem normalmente.
+
+No entanto, todo código em execução no modo segmentado deve agrupar os acessos à memória não empilhada em **macros especiais**. Essas macros garantem que o registro de segmento correto seja usado. A falha em usar a macro correta resultará em um acesso incorreto à memória que provavelmente causará erros difíceis de encontrar.
 
 Existem três macros de acesso à memória de baixo nível:
 
