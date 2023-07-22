@@ -1,17 +1,15 @@
-Welcome to the SeaBIOS project!  This project implements an X86 legacy
-bios that is built with standard GNU tools.
+Bem-vindo ao projeto SeaBIOS! Este projeto implementa uma bios no formato histórica X86 que é construída usando-se com ferramentas padrão GNU.
 
-Please see build and developer information at:
+Consulte as informações de compilação e desenvolvedor em:
 
-  http://seabios.org/Developer_Documentation
+  [http://seabios.org/Developer_Documentation](http://seabios.org/Developer_Documentation)
 
-For the impatient, SeaBIOS is built for QEMU and tested on QEMU with:
+Para os impacientes, o SeaBIOS foi desenvolvido para QEMU e testado no QEMU com:
 
+```bash
   make
   qemu -bios out/bios.bin
+```
 
-SeaBIOS can be configured with kconfig.  To change the default
-configuration one can run "make menuconfig" prior to running "make".
-
-For other types of builds, and for more detailed developer
-documentation, please see the online documentation listed above.
+A `SeaBIOS` pode ser configurado com `kconfig` (Sistema de Construção do Kernel do Linux). Para alterar o padrão configuração pode-se executar `make menuconfig` antes de executar `make`.
+Para outros tipos de compilações e para desenvolvedores mais detalhados documentação, consulte a documentação on-line listada acima.
