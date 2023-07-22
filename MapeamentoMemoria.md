@@ -116,6 +116,26 @@ As funções de entrada ASSEMBLER para chamadas de modo segmentado (todos os mod
 | SP | SS:ESP ESP SP | Registrador de ponteiro de pilha. Contém o endereço superior da pilha. |
 | IP | CS:EIP EIP IP | Ponteiro de Índice. Mantém o deslocamento da próxima instrução. Só pode ser lido. |
 
+| Ordem do bit  | Nome | Finalidade |
+|---|---|---|
+| 0 | CF | Sinalizador de Carregamento |
+| 2 | PF | Sinalizador de Paridade |
+| 4 | AF | Sinalizador de Carregamento Auxiliar |
+| 6 | ZF | Sinalizador de Zero |
+| 7 | SF | Sinalizador de Assinatura |
+| 8 | TF | Sinalizador de "Trap" |
+| 9 | IF | Sinalizador de Interrupção Ativada |
+| 10 | DF | Sinalizador de Direção |
+| 11 | OF | Sinalizador de Estouro |
+| 12-13 | IOPL | Sinalizador de I/O privilegiada |
+| 14 | NT | Sinalizador de Tarefa Aninhada |
+| 16 | RF | Sinalizador de Conitinuidade |
+| 17 | VM | Sinalizador de modo virtual 8086  |
+| 18 | AC | Sinalizador de checagem de alinhamento |
+| 19 | VIF | Sinalizador de Interrupção Virtual |
+| 20 | VIP | Sinalizador de Interrupção Virtual Pendente |
+| 21 | ID | Sinalizador de ID |
+
 No entanto, todo código em execução no modo segmentado deve agrupar os acessos à memória não empilhada em macros especiais. Essas macros garantem que o registro de segmento correto seja usado. A falha em usar a macro correta resultará em um acesso incorreto à memória que provavelmente causará erros difíceis de encontrar.
 
 Existem três macros de acesso à memória de baixo nível:
