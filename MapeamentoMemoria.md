@@ -59,7 +59,7 @@ Ao compilar para os modos de 16 bits, MODE16 é verdadeiro e MODESEGMENT é verd
 
 ## Memória comum usada em Tempo de Execução
 
-Existem várias áreas de memória que o SeaBIOS "runtime" [fase](https://seabios.org/Execution_and_code_flow "Execução e fluxo de código") utiliza:
+Existem várias áreas de memória que o SeaBIOS Utiliza na [fase de execução](https://seabios.org/Execution_and_code_flow "Execução e fluxo de código"):
 
 | Área da memória Execução           | Abrev |  Início  |   Fim    |
 |------------------------------------|-------|----------|----------|
