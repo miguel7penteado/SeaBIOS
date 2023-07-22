@@ -19,7 +19,7 @@ Em emuladores, esta fase começa quando a CPU inicia a execução no **modo 16 b
 Os emuladores mapeiam o binário SeaBIOS para este endereço e o SeaBIOS organiza para que 
 
 * **romlayout.S:reset\_vector()**
-* 
+
 esteja presente lá. Este código chama
 
 * **romlayout.S:entry\_post()**
