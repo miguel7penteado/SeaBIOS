@@ -59,6 +59,13 @@ Ao compilar para os modos de 16 bits, MODE16 é verdadeiro e MODESEGMENT é verd
 
 ## Memória comum usada em Tempo de Execução
 
+| Tabela do descritor de interrupção | (IDT) | 0x000000 | 0x000400 |
+|------------------------------------|-------|----------|----------|
+| Área de dados do BIOS              | (BDA) | 0x000400 | 0x000500 |
+| Extended BIOS Data Area            | (EBDA | 0x09FC00 | 0x0A0000 |
+| Memória "Baixa"                    |       | 0x0E0000 | 0x0F0000 |
+| O segmento do BIOS                 |       | 0x0F0000 | 0x100000 |
+
 Existem várias áreas de memória que o SeaBIOS "runtime" [fase](https://seabios.org/Execution_and_code_flow "Execução e fluxo de código") utiliza:
 ### Tabela do descritor de interrupção (IDT)
 * **0x000000-0x000400**: Tabela do descritor de interrupção (IDT). Esta área define 256 vetores de interrupção conforme definido pela especificação da CPU Intel para manipuladores irq de 16 bits. Esta área é lida/gravável em tempo de execução e pode ser acessada a partir do modo real de 16 bits e chamadas de modo bigreal de 16 bits. O SeaBIOS usa apenas esta área para manter a compatibilidade com os sistemas legados.
