@@ -49,18 +49,22 @@ Dois sinalizadores de tempo de compilação estão disponíveis para determinar 
 ## Memória comum usada em tempo de execução
 
 Existem várias áreas de memória que o SeaBIOS "runtime" [fase](https://seabios.org/Execution_and_code_flow "Execução e fluxo de código") utiliza:
+### Tabela do descritor de interrupção (IDT)
+* **0x000000-0x000400**: Tabela do descritor de interrupção (IDT). Esta área define 256 vetores de interrupção conforme definido pela especificação da CPU Intel para manipuladores irq de 16 bits. Esta área é lida/gravável em tempo de execução e pode ser acessada a partir do modo real de 16 bits e chamadas de modo bigreal de 16 bits. O SeaBIOS usa apenas esta área para manter a compatibilidade com os sistemas legados.
 
-* 0x000000-0x000400: Tabela do descritor de interrupção (IDT). Esta área define 256 vetores de interrupção conforme definido pela especificação da CPU Intel para manipuladores irq de 16 bits. Esta área é lida/gravável em tempo de execução e pode ser acessada a partir do modo real de 16 bits e chamadas de modo bigreal de 16 bits. O SeaBIOS usa apenas esta área para manter a compatibilidade com os sistemas legados.
-  
-* 0x000400-0x000500: Área de dados do BIOS (BDA). Esta área contém vários sinalizadores e atributos herdados. A área é lida/gravável em tempo de execução e pode ser acessada a partir do modo real de 16 bits e chamadas de modo bigreal de 16 bits. O SeaBIOS usa apenas esta área para manter a compatibilidade com os sistemas legados.
-  
-* 0x09FC00-0x0A0000 (típico): Extended BIOS Data Area (EBDA). Esta área contém alguns sinalizadores e atributos herdados. A área geralmente está localizada em 0x9FC00, mas pode ser movida por ROMs de opção, por sistemas operacionais legados e por SeaBIOS se CONFIG_MALLOC_UPPERMEMORY não estiver definido. Sua localização real é determinada por um ponteiro no BDA. A área é lida/gravável em tempo de execução e pode ser acessada a partir do modo real de 16 bits e chamadas do modo bigreal de 16 bits. O SeaBIOS usa apenas esta área para manter a compatibilidade com os sistemas legados.
-  
-* 0x0E0000-0x0F0000 (típico): memória "baixa". Esta área é usada para armazenamento personalizado de leitura/gravação interno do SeaBIOS. A área é lida/gravável em tempo de execução e pode ser acessada a partir do modo real de 16 bits e chamadas do modo bigreal de 16 bits. A área geralmente está localizada no final do segmento eletrônico, mas a compilação pode posicioná-la em qualquer lugar na região 0x0C0000-0x0F0000. No entanto, se CONFIG_MALLOC_UPPERMEMORY não estiver definido, essa região estará entre 0x090000-0x0A0000. O espaço é alocado nesta região marcando uma variável global com o sinalizador "VARLOW" ou chamando malloc_low() durante a inicialização. A área pode ser aumentada dinamicamente (via malloc_low), mas nunca ultrapassará 64K.
-  
-* 0x0F0000-0x100000: O segmento do BIOS. Essa área é usada para código de tempo de execução e variáveis estáticas. O espaço é alocado nessa região marcando uma variável global com VAR16, um dos sinalizadores VARFSEG, ou chamando malloc_fseg() durante a inicialização. A área é somente leitura em tempo de execução e pode ser acessada a partir do modo real de 16 bits, modo bigreal de 16 bits, modo protegido de 16 bits e chamadas de modo segmentado de 32 bits.
+### Área de dados do BIOS (BDA)
+* **0x000400-0x000500**: Área de dados do BIOS (BDA). Esta área contém vários sinalizadores e atributos herdados. A área é lida/gravável em tempo de execução e pode ser acessada a partir do modo real de 16 bits e chamadas de modo bigreal de 16 bits. O SeaBIOS usa apenas esta área para manter a compatibilidade com os sistemas legados.
+
+### Extended BIOS Data Area (EBDA)  
+* **0x09FC00-0x0A0000** (típico): Extended BIOS Data Area (EBDA). Esta área contém alguns sinalizadores e atributos herdados. A área geralmente está localizada em 0x9FC00, mas pode ser movida por ROMs de opção, por sistemas operacionais legados e por SeaBIOS se CONFIG_MALLOC_UPPERMEMORY não estiver definido. Sua localização real é determinada por um ponteiro no BDA. A área é lida/gravável em tempo de execução e pode ser acessada a partir do modo real de 16 bits e chamadas do modo bigreal de 16 bits. O SeaBIOS usa apenas esta área para manter a compatibilidade com os sistemas legados.
+
+### Memória "Baixa"  
+* **0x0E0000-0x0F0000** (típico): memória "baixa". Esta área é usada para armazenamento personalizado de leitura/gravação interno do SeaBIOS. A área é lida/gravável em tempo de execução e pode ser acessada a partir do modo real de 16 bits e chamadas do modo bigreal de 16 bits. A área geralmente está localizada no final do segmento eletrônico, mas a compilação pode posicioná-la em qualquer lugar na região 0x0C0000-0x0F0000. No entanto, se CONFIG_MALLOC_UPPERMEMORY não estiver definido, essa região estará entre 0x090000-0x0A0000. O espaço é alocado nesta região marcando uma variável global com o sinalizador "VARLOW" ou chamando malloc_low() durante a inicialização. A área pode ser aumentada dinamicamente (via malloc_low), mas nunca ultrapassará 64K.
+
+### O segmento do BIOS  
+* **0x0F0000-0x100000**: O segmento do BIOS. Essa área é usada para código de tempo de execução e variáveis estáticas. O espaço é alocado nessa região marcando uma variável global com VAR16, um dos sinalizadores VARFSEG, ou chamando malloc_fseg() durante a inicialização. A área é somente leitura em tempo de execução e pode ser acessada a partir do modo real de 16 bits, modo bigreal de 16 bits, modo protegido de 16 bits e chamadas de modo segmentado de 32 bits.
  
-Todas as áreas acima também são lidas/gravadas durante a fase de inicialização do SeaBIOS e são acessíveis no modo plano de 32 bits.
+>> Todas as áreas acima também são lidas/gravadas durante a fase de inicialização do SeaBIOS e são acessíveis no modo plano de 32 bits.
 
 ## Acesso à memória em modo segmentado
 
@@ -82,14 +86,17 @@ Como a maioria dos acessos à memória são para [memória comum usada em tempo 
 * GET_LOW / SET_LOW : Acessar variáveis internas marcadas com VARLOW. (Também existem macros relacionadas GET_LOWFLAT / SET_LOWFLAT para acessar o armazenamento alocado com malloc_low.)
 * GET_GLOBAL : Acessar variáveis internas marcadas com os sinalizadores VAR16 ou VARFSEG. (Há também a macro relacionada GET_GLOBALFLAT para acessar o armazenamento alocado com malloc_fseg.)
 
-## Memória disponível durante a inicialização
+## Memória disponível durante a Inicialização
 
 Durante a [fase] do POST (https://seabios.org/Execution_and_code_flow "Execução e fluxo de código"), o código pode acessar totalmente os primeiros 4 gigabytes de memória. No entanto, os acessos à memória são geralmente limitados à [memória comum usada em tempo de execução](#Common_memory_used_at_run-time) e áreas alocadas em tempo de execução por meio de uma das chamadas malloc:
 
+### Zona permanente de alta memória
 * **malloc_high** : Zona permanente de alta memória. Esta área é usada para armazenamento personalizado de leitura/gravação interno do SeaBIOS. A área está localizada no topo dos primeiros 4 gigabytes de RAM. É comumente usado para armazenar tabelas padrão acessadas pelo sistema operacional em tempo de execução (ACPI, SMBIOS e MPTable) e para buffers DMA usados por drivers de hardware. A área é lida/gravável em tempo de execução e uma entrada no mapa de memória do e820 é usada para reservá-la. Ao rodar em um emulador que tenha apenas 1 megabyte de ram esta zona ficará vazia.
 
+### Zona temporária de alta memória
 * **malloc_tmphigh** : Zona temporária de alta memória. Esta área é usada para armazenamento personalizado de leitura/gravação durante a fase de inicialização do SeaBIOS. A área geralmente começa após o primeiro 1 megabyte de RAM (0x100000) e termina antes da zona permanente de alta memória. Ao rodar em um emulador que tenha apenas 1 megabyte de ram esta zona estará vazia. A área não é reservada do sistema operacional, portanto não deve ser acessada após a fase de inicialização do SeaBIOS.
 
+### Zona temporária de pouca memória
 * **malloc_tmplow** : Zona temporária de pouca memória. Esta área é usada para armazenamento personalizado de leitura/gravação durante a fase de inicialização do SeaBIOS. A área reside entre 0x07000-0x90000. A área não é reservada do sistema operacional e por especificação é necessário zerá-la ao final da fase de inicialização.
 
-As regiões "tmplow" e "tmphigh" só estão disponíveis durante a fase de inicialização. Qualquer acesso (leitura ou gravação) após a conclusão da fase de inicialização pode resultar em erros difíceis de encontrar.
+>> As regiões "tmplow" e "tmphigh" só estão disponíveis durante a fase de inicialização. Qualquer acesso (leitura ou gravação) após a conclusão da fase de inicialização pode resultar em erros difíceis de encontrar.
